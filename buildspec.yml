@@ -1,0 +1,18 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+
+  pre_build:
+    commands:
+      - npm ci
+
+  build:
+    commands:
+      - npm run build
+
+  post_build:
+    commands:
+      - aws s3 sync --delete ./dist s3://${BUCKET_ID}
+      - aws cloudfront create-invalidation --distribution-id ${CF_ID} --paths /index.html
